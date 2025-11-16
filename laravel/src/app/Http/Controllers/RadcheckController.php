@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Radcheck;
+use Illuminate\Support\Facades\DB;
 
 class RadcheckController extends Controller
 {
@@ -75,4 +76,20 @@ class RadcheckController extends Controller
     {
         //
     }
+
+    /** get_email_login guest */
+    public function get_email_users(Request $request)
+    {
+        $emailusers = Radcheck::select('username')->search($request->search)->where('attribute','Cleartext-Password')->where('username','LIKE','%@%')->groupby('username')->paginate(8);
+        return view('hotspot.userguest',compact('emailusers'));
+    }
+
+    /** export csv file */
+    public function export_email_users()
+    {
+        //$emailusers = Radcheck::select('username')->where('attribute','Cleartext-Password')->where('username','LIKE','%@%')->groupby('username')->get();
+        $emailusers = DB::select("SELECT @rownum:=@rownum+1 no, username AS email FROM radcheck, (SELECT @rownum:=0) r WHERE attribute='Cleartext-Password' AND username LIKE '%@%' GROUP BY username");
+        return response()->json($emailusers,200);
+    }
+
 }

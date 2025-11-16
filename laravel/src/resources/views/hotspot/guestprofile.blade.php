@@ -38,14 +38,14 @@
         </div>
     </div>
     <script>
-        const url_base = "{{ env('APP_URL')}}:8000/hotspot/user/email/profile";
+        const url_base = "{{ env('APP_URL_AXIOS')}}:9080/hotspot/user/email/profile";
         const expire = document.getElementById('expire');
         const rate_limit = document.getElementById('rate_limit');
         const btnsave = document.getElementById('btnsave');
         btnsave.addEventListener('click', () => {
             axios
                 .patch(
-                    `<?php echo env('APP_URL'); ?>:8000/hotspot/user/email/profile/{{$radgroupreply->id}}`,
+                    `<?php echo env('APP_URL_AXIOS'); ?>/hotspot/user/email/profile/{{$radgroupreply->id}}`,
                     {
                         'expire':expire.value,
                         'rate_limit':rate_limit.value,

@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Country;
+use App\Models\Guest;
 use Illuminate\Http\Request;
 
-class CountryController extends Controller
+class GuestController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -34,16 +34,15 @@ class CountryController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Country $country)
+    public function show(Guest $guest)
     {
-	$countries = Country::get();
-        return response()->json($countries,200);
+        //
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Country $country)
+    public function edit(Guest $guest)
     {
         //
     }
@@ -51,7 +50,7 @@ class CountryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Country $country)
+    public function update(Request $request, Guest $guest)
     {
         //
     }
@@ -59,7 +58,7 @@ class CountryController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Country $country)
+    public function destroy(Guest $guest)
     {
         //
     }

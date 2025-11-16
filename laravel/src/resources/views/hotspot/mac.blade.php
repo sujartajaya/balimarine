@@ -9,7 +9,7 @@
                 editmac = true;
                 axios
                     .get(
-                        `<?php echo env('APP_URL'); ?>:8000/hotspot/mac/binding/${id}`
+                        `<?php echo env('APP_URL_AXIOS'); ?>/hotspot/mac/binding/${id}`
                     )
                     .then((response) => {
                         const data = response.data;
@@ -43,7 +43,7 @@
                 if (userConfirmed) {
                     axios
                     .post(
-                         `<?php echo env('APP_URL'); ?>:8000/hotspot/mac/binding/${id}`,{
+                         `<?php echo env('APP_URL_AXIOS'); ?>/hotspot/mac/binding/${id}`,{
                             'id': id
                         })
                     .then((response) => {
@@ -296,7 +296,7 @@
                 if (editmac == false) {
                     axios
                     .post(
-                        "<?php echo env('APP_URL'); ?>:8000/hotspot/mac/binding", {
+                        "<?php echo env('APP_URL_AXIOS'); ?>/hotspot/mac/binding", {
                             'mac': mac.value,
                             'type' : type.value,
                             'comment' : comment.value,
@@ -327,7 +327,7 @@
                     })
                 } else {
                     axios
-                    .patch(`<?php echo env('APP_URL'); ?>:8000/hotspot/mac/binding/${idmac}`, {
+                    .patch(`<?php echo env('APP_URL_AXIOS'); ?>/hotspot/mac/binding/${idmac}`, {
                         'mac' : mac.value,
                         'type' : type.value,
                         'comment' : comment.value,

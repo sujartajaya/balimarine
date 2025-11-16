@@ -58,7 +58,7 @@ services:
     build:
       args:
         user: radius
-        uid: 1000
+        uid: 1002
       context: ./php
       dockerfile: Dockerfile
     image: my-php-image-01

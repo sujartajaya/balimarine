@@ -11,9 +11,11 @@ use App\Http\Controllers\MikrotikController;
 use App\Http\Controllers\RadreplyController;
 use App\Http\Controllers\RadgroupreplyController;
 use App\Http\Controllers\GuestuserController;
+use App\Http\Controllers\RadcheckController;
+use App\Http\Controllers\CountryController;
 
 //Route::get('/', [UserController::class,'index']);
-Route::get('/', [MikrotikController::class,'system']);
+Route::get('/', [MikrotikController::class,'system'])->name('root');
 
 Route::get('/home', [AdminController::class,'index']);
 Route::get('/login', [UserController::class,'index']);
@@ -29,7 +31,11 @@ Route::prefix('/web')->group(function () {
     Route::post('/api/logmail',[WebloginController::class,'loginemail']);
     Route::post('/login',[WebloginController::class,'reqlogin']); /** login hotspot */
     //Route::post('/login',[TestController::class,'loginv2']);
-
+    Route::post('/loginv3',[WebloginController::class,'reqloginv3'])->name('weblogin');
+    Route::post('/loginv4',[WebloginController::class,'reqloginv4'])->name('webloginv4');
+    Route::post('/loginv3/store',[WebloginController::class,'store']);
+    Route::post('/loginv4/store',[WebloginController::class,'storev4']);
+    Route::get('/countries', [CountryController::class,'show'])->name('country');
 });
 
 Route::middleware('auth')->group(function () {
@@ -69,7 +75,7 @@ Route::prefix('/test')->group(function () {
     });
     Route::get('/dashboard',[MikrotikController::class,'system']);
     Route::post('/user/profile',[MikrotikController::class,'set_login_email_profile']);
-    
+    Route::get('/userguest/export',[RadcheckController::class,'export_email_users']);
 });
 
 Route::middleware('auth')->prefix('/hotspot')->group(function () {
@@ -95,7 +101,7 @@ Route::middleware('auth')->prefix('/hotspot')->group(function () {
     Route::post('/radreply',[RadreplyController::class,'store']);
     Route::get('/usergroup',[RadgroupreplyController::class,'show']);
     Route::get('/user/email/active',[MikrotikController::class,'login_email_active']); /** blade */
-
+    Route::get('/email/users',[RadcheckController::class,'get_email_users']); /** blade */
 });
 
 Route::middleware('auth')->prefix('/mikrotik')->group(function () {
