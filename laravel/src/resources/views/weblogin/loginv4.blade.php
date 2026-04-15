@@ -9,10 +9,39 @@
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script type="text/javascript" src="/tsi/md5.js"></script>
 	<link href="/medialink1.png" rel="icon" type="image/x-icon" />
+    <style>
+        /* Perbaikan agar background benar-benar menutupi seluruh layar di semua device */
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100vh;
+            /* Menggunakan min-height: 100dvh jika browser mendukung (dynamic viewport) */
+            min-height: 100dvh; 
+            background-image: url('/img/bg.png');
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: cover;
+            background-attachment: fixed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Memastikan teks input selalu hitam dan mudah dibaca */
+        #login_email {
+            color: #000000 !important; /* Hitam pekat */
+            background-color: rgba(255, 255, 255, 1); /* Putih solid */
+        }
+
+        /* Warna teks placeholder (tulisan samar sebelum diisi) */
+        #login_email::placeholder {
+            color: #4b5563; /* Abu-abu gelap agar tetap terbaca */
+        }
+    </style>
 </head>
-<body class="flex justify-center items-center min-h-screen p-2 bg-no-repeat bg-cover bg-center bg-fixed" 
-      style="background-image: url('/img/bg.png');">
-    <div class="max-w-sm w-full bg-red-400/90 p-6 rounded-lg text-center text-white shadow-lg backdrop-blur-sm">
+<body class="p-2">
+    <div class="max-w-sm w-full bg-red-600/90 p-6 rounded-2xl text-center text-white shadow-2xl backdrop-blur-md">
         <div class="my-2 flex justify-center">
             <img src="{{ route('root') }}/logo_tsi.png" alt="Bali Marine Park">
         </div>
