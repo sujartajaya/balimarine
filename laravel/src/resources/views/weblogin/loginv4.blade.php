@@ -37,7 +37,7 @@
     </style>
 </head>
 <body class="p-4">
-    <div class="max-w-sm w-full bg-red-600/80 p-8 rounded-3xl text-center text-white shadow-2xl backdrop-blur-md">
+    <div class="max-w-sm w-full bg-red-600/80 p-8 rounded-3xl text-center text-blue-600 shadow-2xl backdrop-blur-md">
         
         <p class="text-sm px-2" id="welcomeinfo">
             <?php if ($guest) { ?> 
