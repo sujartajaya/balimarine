@@ -10,8 +10,9 @@
     <script type="text/javascript" src="/tsi/md5.js"></script>
 	<link href="/medialink1.png" rel="icon" type="image/x-icon" />
 </head>
-<body class="bg-white flex justify-center items-center min-h-screen p-2">
-    <div class="max-w-sm w-full bg-red-400 p-6 rounded-lg text-center text-white shadow-lg">
+<body class="flex justify-center items-center min-h-screen p-2 bg-no-repeat bg-cover bg-center bg-fixed" 
+      style="background-image: url('/img/bg.png');">
+    <div class="max-w-sm w-full bg-red-400/90 p-6 rounded-lg text-center text-white shadow-lg backdrop-blur-sm">
         <div class="my-2 flex justify-center">
             <img src="{{ route('root') }}/logo_tsi.png" alt="Bali Marine Park">
         </div>
