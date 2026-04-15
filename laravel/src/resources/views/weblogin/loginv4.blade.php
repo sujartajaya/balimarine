@@ -8,15 +8,13 @@
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script type="text/javascript" src="/tsi/md5.js"></script>
-	<link href="/medialink1.png" rel="icon" type="image/x-icon" />
+    <link href="/medialink1.png" rel="icon" type="image/x-icon" />
     <style>
-        /* Perbaikan agar background benar-benar menutupi seluruh layar di semua device */
         body {
             margin: 0;
             padding: 0;
             width: 100%;
             min-height: 100vh;
-            /* Menggunakan min-height: 100dvh jika browser mendukung (dynamic viewport) */
             min-height: 100dvh; 
             background-image: url('/img/bg.png');
             background-repeat: no-repeat;
@@ -28,47 +26,49 @@
             align-items: center;
         }
 
-        /* Memastikan teks input selalu hitam dan mudah dibaca */
         #login_email {
-            color: #000000 !important; /* Hitam pekat */
-            background-color: rgba(255, 255, 255, 1); /* Putih solid */
+            color: #000000 !important;
+            background-color: white;
         }
 
-        /* Warna teks placeholder (tulisan samar sebelum diisi) */
         #login_email::placeholder {
-            color: #4b5563; /* Abu-abu gelap agar tetap terbaca */
+            color: #6b7280;
         }
     </style>
 </head>
-<body class="p-2">
-    <div class="max-w-sm w-full bg-red-600/90 p-6 rounded-2xl text-center text-white shadow-2xl backdrop-blur-md">
-        <div class="my-2 flex justify-center">
-            <img src="{{ route('root') }}/logo_tsi.png" alt="Bali Marine Park">
-        </div>
+<body class="p-4">
+    <div class="max-w-sm w-full bg-red-600/80 p-8 rounded-3xl text-center text-white shadow-2xl backdrop-blur-md">
+        
+        <p class="text-sm px-2" id="welcomeinfo">
+            <?php if ($guest) { ?> 
+                <b>Welcome back {{ $guest['email'] }}</b>
+            <?php } else { ?>
+                Please enter your email to access the internet.
+            <?php } ?>
+        </p>
 
-        <p class="text-sm font-semibold">FREE INTERNET ACCESS</p>
-        <p class="text-xs mt-2 px-2" id="welcomeinfo" ><?php if ($guest) { ?>  <b>Welcome back {{ $guest['email'] }}</b><?php } else {?>By clicking the "Sigin" button, you consent to receive marketing, promotional messages and information about Bali Marine and Bali Safari Park. You may opt out of communications at any time. All data obtained is subject to the Privacy Policy.<?php } ?></p>
-	<input type="email" class="rounded-lg text-gray-800 mt-4 w-full px-6 py-2 <?php if($guest) { echo "hidden"; } ?>" name="email" required autofocus id="login_email" placeholder="Input your email" />
+        <input type="email" 
+               class="rounded-xl text-gray-800 mt-6 w-full px-6 py-3 border-none focus:ring-2 focus:ring-teal-300 <?php if($guest) { echo "hidden"; } ?>" 
+               name="email" 
+               required 
+               autofocus 
+               id="login_email" 
+               placeholder="Input your email" />
+        
         <input type="hidden" id="mac" value="<?php if (isset($data['mac'])) { echo $data['mac']; } ?>" >
-	<button id="submitBtn" class="bg-teal-400 text-indigo-900 font-bold px-6 py-2 rounded-lg mt-4 w-full <?php if ($guest) { echo "hidden"; } ?>">Sigin</button>
-        <button id="siginForm" class="bg-teal-400 text-indigo-900 font-bold px-6 py-2 rounded-lg mt-4 w-full <?php if (!$guest) { echo "hidden"; } ?>">Login</button>
+        
+        <button id="submitBtn" class="bg-teal-400 text-indigo-950 font-black px-6 py-3 rounded-xl mt-4 w-full tracking-wide uppercase <?php if ($guest) { echo "hidden"; } ?>">
+            Sign In
+        </button>
+        
+        <button id="siginForm" class="bg-teal-400 text-indigo-950 font-black px-6 py-3 rounded-xl mt-4 w-full tracking-wide uppercase <?php if (!$guest) { echo "hidden"; } ?>">
+            Login
+        </button>
 
-        <div class="mt-6 text-sm">
-            <p id="errorInfo" class="font-bold text-red-800"><?php if(isset($data['error'])) { echo $data['error']; } ?></p>
-        </div>
-        <div class="mt-6 text-sm">
-            <p class="font-bold">Jalan Bypass Prof. Dr. Ida Bagus Mantra</p>
-            <p>Km. 19,8 Kec. Gianyar, Bali</p>
-            <p>80551 - Indonesia</p>
-        </div>
-
-        <div class="mt-4 space-y-2 text-sm flex flex-col text-left">
-            <p>☎  (+62) 361 950 000</p>
-            <p>📷 tamansafaribali</p>
-            <p>🌐 tamansafari.com/marine-safari-bali/marine-life/</p>
+        <div class="mt-4">
+            <p id="errorInfo" class="font-bold text-yellow-300 text-xs"></p>
         </div>
     </div>
-
 
     <form name="loginweb" action="<?php if (isset($data['link-login-only'])) { echo $data['link-login-only']; } ?>" method="POST">
         <input type="hidden" name="username" value="<?php if($guest) { echo $guest['username']; }?>" />
@@ -83,16 +83,13 @@
         const welcomeinfo = document.getElementById('welcomeinfo');
         const mac_add = document.getElementById('mac');
         const errorInfo = document.getElementById('errorInfo');
-
         let email = document.getElementById('login_email');
-
 
         submitBtn.addEventListener('click', async function(e) {
             e.preventDefault();
             const country_id = 96;
             const post_url = "<?php echo route('webloginv4'); ?>/store";
             try {
-
                 const response = await fetch(post_url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -100,50 +97,36 @@
                 })
                 const result = await response.json();
 
-
                 document.loginweb.username.value = result.msg.username;
                 document.loginweb.password.value = result.msg.password;
 
                 if (result.error === true) {
                     let errmsg = "";
-
-                    if (typeof result.msg.name !== "undefined") {
-                        errmsg = `<b>${result.msg.name[0]}</b><br>`;
-                    }
-                    if (typeof result.msg.email !== "undefined") {
-                        errmsg = errmsg + `<b>${result.msg.email[0]}</b>`;
-                    }
-
+                    if (typeof result.msg.name !== "undefined") { errmsg = `<b>${result.msg.name[0]}</b><br>`; }
+                    if (typeof result.msg.email !== "undefined") { errmsg += `<b>${result.msg.email[0]}</b>`; }
                     errorInfo.innerHTML = errmsg;
                 } else {
-
                     submitBtn.classList.add('hidden');
-		    email.classList.add('hidden');
+                    email.classList.add('hidden');
                     siginForm.classList.remove('hidden');
-
-		    errorInfo.innerHTML = '';
-                    if (result.exist === false) {
-                        welcomeinfo.innerHTML = `<b>Welcome ${result.msg.name}</b>`
-                    } else {
-                        welcomeinfo.innerHTML = `<b>Welcome back ${result.msg.name}</b>`
-                    }
+                    errorInfo.innerHTML = '';
+                    welcomeinfo.innerHTML = result.exist === false ? `<b>Welcome ${result.msg.name}</b>` : `<b>Welcome back ${result.msg.name}</b>`;
                 }
-
-
             } catch (error) {
                 console.log(error);
+                errorInfo.innerHTML = "Connection Error. Please try again.";
             }
         });
 
         siginForm.addEventListener('click', () => {
-                    <?php if (isset($data['chap-d'])) { if(strlen($data['chap-id']) < 1)  { ?>
-                        document.loginweb.submit(); <?php } ?>
-                        return false;
-                    <?php }  else { ?>
-                        document.loginweb.password.value = hexMD5('<?php if (isset($data['chap-id'])) { echo $data['chap-id']; } ?>' + document.loginweb.password.value + '<?php if (isset($data['chap-challenge'])) { echo $data['chap-challenge']; } ?>');
-                        document.loginweb.submit();
-                        return false;
-                  <?php } ?>
+            <?php if (isset($data['chap-d'])) { if(strlen($data['chap-id']) < 1) { ?>
+                document.loginweb.submit(); <?php } ?>
+                return false;
+            <?php } else { ?>
+                document.loginweb.password.value = hexMD5('<?php if (isset($data['chap-id'])) { echo $data['chap-id']; } ?>' + document.loginweb.password.value + '<?php if (isset($data['chap-challenge'])) { echo $data['chap-challenge']; } ?>');
+                document.loginweb.submit();
+                return false;
+            <?php } ?>
         })
     </script>
 </body>
