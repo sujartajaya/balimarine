@@ -13,9 +13,19 @@ use App\Http\Controllers\RadgroupreplyController;
 use App\Http\Controllers\GuestuserController;
 use App\Http\Controllers\RadcheckController;
 use App\Http\Controllers\CountryController;
+use App\Http\Controllers\DashboardController;
 
 //Route::get('/', [UserController::class,'index']);
 Route::get('/', [MikrotikController::class,'system'])->name('root');
+
+Route::get('/dashboard', [DashboardController::class,'index']);
+
+/** API untuk hotspot */
+Route::post('/disconnect/{username}', [UserController::class, 'disconnect']);
+Route::get('/csrf-token', function () {
+    return response()->json(['token' => csrf_token()]);
+});
+/** End API untuk hotspot */
 
 Route::get('/home', [AdminController::class,'index']);
 Route::get('/login', [UserController::class,'index']);

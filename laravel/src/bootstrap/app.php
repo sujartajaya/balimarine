@@ -10,6 +10,7 @@ use App\Http\Middleware\OperatorMiddleware;
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
+        api: __DIR__.'/../routes/api.php', // Baris ini yang mengaktifkan API
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
@@ -17,7 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
         'web/*',
         'test/*',
-        'hotspot/*'
+        'hotspot/*',
+        'disconnect/*',
+        'api/*'
         ]);
         $middleware->alias([
             'auth' => AuthMiddleware::class,

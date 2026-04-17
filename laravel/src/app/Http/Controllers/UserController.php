@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Services\MikrotikService;
 
 class UserController extends Controller
 {
@@ -110,5 +111,15 @@ class UserController extends Controller
     public function registeruser()
     {
         return view('user.register');
+    }
+
+    /** DIpakai untuk disonnect user login hotspot */
+    public function disconnect($username, MikrotikService $mt)
+    {
+        $mt->disconnectUser($username);
+
+        return response()->json([
+            'status' => 'success'
+        ]);
     }
 }

@@ -10,11 +10,17 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     zip \
     unzip \
-    freeradius-utils
+    freeradius-utils \
+    default-mysql-client
+    
+# NodeJS (multi-stage)
+COPY --from=node:22-slim /usr/local/bin/node /usr/local/bin/
+COPY --from=node:22-slim /usr/local/lib/node_modules /usr/local/lib/node_modules
+RUN ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd sockets
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 

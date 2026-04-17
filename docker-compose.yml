@@ -4,7 +4,7 @@ services:
     container_name: mysql-container-01
     #  working_dir: /home
     volumes:
-      #    - ./mysql/dbconfig:/home
+      - ./mysql/dbconfig:/home
       - ./mysql/data:/var/lib/mysql
     environment:
       TZ: "Asia/Makassar"
@@ -57,8 +57,8 @@ services:
   php:
     build:
       args:
-        user: radius
-        uid: 1002
+        user: putu
+        uid: 1000
       context: ./php
       dockerfile: Dockerfile
     image: my-php-image-01
