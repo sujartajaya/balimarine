@@ -16,9 +16,11 @@ use App\Http\Controllers\CountryController;
 use App\Http\Controllers\DashboardController;
 
 //Route::get('/', [UserController::class,'index']);
-Route::get('/', [MikrotikController::class,'system'])->name('root');
+// Route::get('/', [MikrotikController::class,'system'])->name('root');
 
-Route::get('/dashboard', [DashboardController::class,'index']);
+// Route::get('/dashboard', [DashboardController::class,'index']);
+
+Route::get('/', [DashboardController::class,'index']);
 
 /** API untuk hotspot */
 Route::post('/disconnect/{username}', [UserController::class, 'disconnect']);

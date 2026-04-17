@@ -18,7 +18,7 @@
     <!-- HERO -->
     <div class="bg-blue-600/30 backdrop-blur p-6 rounded-xl mb-6 shadow-lg">
         <h2 class="text-xl font-semibold">Welcome to Ocean Network</h2>
-        <p class="text-sm opacity-80">Monitoring hotspot seperti kehidupan bawah laut</p>
+        <p class="text-sm opacity-80">Hotspot monitoring</p>
     </div>
 
     <!-- CARDS -->
