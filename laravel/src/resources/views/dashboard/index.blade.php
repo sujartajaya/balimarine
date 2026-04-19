@@ -57,10 +57,13 @@
         <h2 class="mb-4 font-bold text-sm sm:text-base">🐠 Active Users</h2>
 
         <div class="overflow-x-auto">
-            <table class="w-full min-w-[600px] text-xs sm:text-sm">
+            <table class="w-full min-w-[900px] text-xs sm:text-sm">
                 <thead class="text-left border-b border-blue-500">
                     <tr>
                         <th>User</th>
+                        <th>Email</th>
+                        <th>OS</th>
+                        <th>Browser</th>
                         <th>IP</th>
                         <th>MAC</th>
                         <th>Duration</th>
@@ -72,11 +75,27 @@
                     @foreach($onlineUsers as $user)
                     <tr class="border-b border-blue-800">
                         <td>{{ $user->username }}</td>
+
+                        <td>
+                            {{ $user->guest->email ?? '-' }}
+                        </td>
+
+                        <td>
+                            {{ $user->guest->os_client ?? '-' }}
+                        </td>
+
+                        <td>
+                            {{ $user->guest->browser_client ?? '-' }}
+                        </td>
+
                         <td>{{ $user->framedipaddress }}</td>
+
                         <td>{{ $user->callingstationid }}</td>
+
                         <td>
                             {{ \Carbon\Carbon::parse($user->acctstarttime)->diffForHumans(null, true) }}
                         </td>
+
                         <td>
                             {{ number_format(($user->acctinputoctets + $user->acctoutputoctets)/1024/1024,2) }} MB
                         </td>
@@ -84,6 +103,9 @@
                     @endforeach
                 </tbody>
             </table>
+        </div>
+        <div class="mt-4">
+            {{ $onlineUsers->links() }}
         </div>
     </div>
 
