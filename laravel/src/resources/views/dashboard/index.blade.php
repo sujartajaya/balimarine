@@ -57,6 +57,32 @@
         <h2 class="mb-4 font-bold text-sm sm:text-base">🐠 Active Users</h2>
 
         <div class="overflow-x-auto">
+
+            <div class="flex flex-col sm:flex-row justify-between gap-3 mb-4">
+
+                <!-- 🔍 SEARCH -->
+                <form method="GET" class="flex gap-2 w-full sm:w-auto">
+                    <input 
+                        type="text" 
+                        name="search"
+                        value="{{ request('search') }}"
+                        placeholder="Search username / email / MAC..."
+                        class="px-3 py-2 rounded-lg text-black w-full sm:w-64"
+                    >
+
+                    <button class="bg-cyan-500 px-4 py-2 rounded-lg">
+                        Search
+                    </button>
+                </form>
+
+                <!-- 📄 EXPORT -->
+                <a href="{{ route('dashboard.export', ['search' => request('search')]) }}"
+                class="bg-green-500 px-4 py-2 rounded-lg text-center">
+                    Export CSV
+                </a>
+
+            </div>
+
             <table class="w-full min-w-[900px] text-xs sm:text-sm">
                 <thead class="text-left border-b border-blue-500">
                     <tr>

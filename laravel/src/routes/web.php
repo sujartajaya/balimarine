@@ -21,7 +21,8 @@ use App\Http\Controllers\DashboardController;
 // Route::get('/dashboard', [DashboardController::class,'index']);
 
 Route::get('/', [DashboardController::class,'index']);
-
+Route::get('/dashboard/export', [DashboardController::class, 'export'])
+    ->name('dashboard.export');
 /** API untuk hotspot */
 Route::post('/disconnect/{username}', [UserController::class, 'disconnect']);
 Route::get('/csrf-token', function () {
