@@ -78,7 +78,7 @@
                 <!-- 📄 EXPORT -->
                 <a href="{{ route('dashboard.export', ['search' => request('search')]) }}"
                 class="bg-green-500 px-4 py-2 rounded-lg text-center">
-                    Export CSV
+                    Export Excel
                 </a>
 
             </div>

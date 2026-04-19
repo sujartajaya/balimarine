@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Radacct;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
-
-use App\Repositories\RadacctRepository;
+use App\Exports\UsersExport;
+use Maatwebsite\Excel\Facades\Excel;
+// use App\Repositories\RadacctRepository;
 
 class DashboardController extends Controller
 {
@@ -72,64 +73,76 @@ class DashboardController extends Controller
 
     }
 
+    // public function export(Request $request)
+    // {
+    //     $query = Radacct::with('guest')
+    //         ->whereNull('acctstoptime');
+
+    //     // ikutkan filter search
+    //     if ($request->search) {
+    //         $search = $request->search;
+
+    //         $query->where(function ($q) use ($search) {
+    //             $q->where('username', 'like', "%$search%")
+    //             ->orWhere('callingstationid', 'like', "%$search%")
+    //             ->orWhereHas('guest', function ($q2) use ($search) {
+    //                 $q2->where('email', 'like', "%$search%");
+    //             });
+    //         });
+    //     }
+
+    //     $data = $query->get();
+
+    //     $filename = "hotspot_users_" . date('Ymd_His') . ".csv";
+
+    //     $headers = [
+    //         "Content-Type" => "text/csv",
+    //         "Content-Disposition" => "attachment; filename=$filename",
+    //     ];
+
+    //     $callback = function () use ($data) {
+    //         $file = fopen('php://output', 'w');
+
+    //         // header csv
+    //         fputcsv($file, [
+    //             'Username',
+    //             'Email',
+    //             'OS',
+    //             'Browser',
+    //             'IP',
+    //             'MAC',
+    //             'Start Time',
+    //             'Traffic (MB)'
+    //         ]);
+
+    //         foreach ($data as $row) {
+    //             fputcsv($file, [
+    //                 $row->username,
+    //                 $row->guest->email ?? '-',
+    //                 $row->guest->os_client ?? '-',
+    //                 $row->guest->browser_client ?? '-',
+    //                 $row->framedipaddress,
+    //                 $row->callingstationid,
+    //                 $row->acctstarttime,
+    //                 number_format(($row->acctinputoctets + $row->acctoutputoctets)/1024/1024,2)
+    //             ]);
+    //         }
+
+    //         fclose($file);
+    //     };
+
+    //     return response()->stream($callback, 200, $headers);
+    // }
+
+
+
     public function export(Request $request)
     {
-        $query = Radacct::with('guest')
-            ->whereNull('acctstoptime');
-
-        // ikutkan filter search
-        if ($request->search) {
-            $search = $request->search;
-
-            $query->where(function ($q) use ($search) {
-                $q->where('username', 'like', "%$search%")
-                ->orWhere('callingstationid', 'like', "%$search%")
-                ->orWhereHas('guest', function ($q2) use ($search) {
-                    $q2->where('email', 'like', "%$search%");
-                });
-            });
-        }
-
-        $data = $query->get();
-
-        $filename = "hotspot_users_" . date('Ymd_His') . ".csv";
-
-        $headers = [
-            "Content-Type" => "text/csv",
-            "Content-Disposition" => "attachment; filename=$filename",
-        ];
-
-        $callback = function () use ($data) {
-            $file = fopen('php://output', 'w');
-
-            // header csv
-            fputcsv($file, [
-                'Username',
-                'Email',
-                'OS',
-                'Browser',
-                'IP',
-                'MAC',
-                'Start Time',
-                'Traffic (MB)'
-            ]);
-
-            foreach ($data as $row) {
-                fputcsv($file, [
-                    $row->username,
-                    $row->guest->email ?? '-',
-                    $row->guest->os_client ?? '-',
-                    $row->guest->browser_client ?? '-',
-                    $row->framedipaddress,
-                    $row->callingstationid,
-                    $row->acctstarttime,
-                    number_format(($row->acctinputoctets + $row->acctoutputoctets)/1024/1024,2)
-                ]);
-            }
-
-            fclose($file);
-        };
-
-        return response()->stream($callback, 200, $headers);
+        return Excel::download(
+            new UsersExport($request->search),
+            'hotspot_users.xlsx'
+        );
     }
+
+
 }
