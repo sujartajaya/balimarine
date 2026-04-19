@@ -17,6 +17,6 @@ class Radacct extends Model
 
     public function guest() 
     {
-        return $this->belongsTo(Guest::class,'username');
+        return $this->belongsTo(Guest::class, 'username', 'username');
     }
 }

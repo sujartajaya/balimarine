@@ -21,7 +21,7 @@ class Guest extends Model
 
     public function radacct() 
     {
-        return $this->hasMany(Radacct::class,"username");
+        return $this->hasMany(Radacct::class, 'username', 'username');
     }
 
     public function country() 
