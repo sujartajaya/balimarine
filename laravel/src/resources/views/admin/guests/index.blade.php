@@ -3,7 +3,11 @@
 @section('title', 'Guests Management')
 
 @section('content')
-
+@if(session('success'))
+    <div class="mb-4 p-3 bg-green-500 text-white rounded-lg shadow">
+        {{ session('success') }}
+    </div>
+@endif
 <!-- CARD -->
 <div class="bg-blue-900/40 backdrop-blur p-6 rounded-2xl shadow-lg">
 
@@ -27,10 +31,10 @@
             </form>
 
             <!-- ADD -->
-            <a href="/admin/guests/create"
+            <!-- <a href="/admin/guests/create"
                class="bg-green-500 px-4 py-2 rounded-lg whitespace-nowrap">
                 + Add
-            </a>
+            </a> -->
 
         </div>
 
@@ -80,14 +84,17 @@
                         </a>
 
                         <form method="POST"
-                              action="/admin/guests/{{ $guest->id }}"
-                              class="inline">
+                            action="{{ route('admin.guests.destroy', $guest) }}"
+                            class="inline"
+                            onsubmit="return confirm('Are you sure you want to delete user {{ $guest->username }}?')">
+
                             @csrf
                             @method('DELETE')
 
-                            <button class="bg-red-500 px-3 py-1 rounded text-xs">
+                            <button class="bg-red-500 px-3 py-1 rounded text-xs hover:bg-red-400">
                                 Delete
                             </button>
+
                         </form>
 
                     </td>

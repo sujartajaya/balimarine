@@ -13,7 +13,7 @@
     </a>
 
     <a href="/admin/mikrotik" class="block hover:text-cyan-400">
-        📡 Mikrotik
+        📡 Hotspot router
     </a>
 
     <a href="#" class="block hover:text-cyan-400">

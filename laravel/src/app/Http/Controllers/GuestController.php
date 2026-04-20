@@ -147,6 +147,14 @@ class GuestController extends Controller
      */
     public function destroy(Guest $guest)
     {
-        //
-    }
+        // Hapus data RADIUS dulu
+        Radcheck::where('username', $guest->username)->delete();
+        Radreply::where('username', $guest->username)->delete();
+
+        // Hapus guest
+        $guest->delete();
+
+        return redirect('/admin/guests')
+            ->with('success', 'Guest deleted successfully');
+        }
 }
