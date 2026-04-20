@@ -14,13 +14,17 @@ use App\Http\Controllers\GuestuserController;
 use App\Http\Controllers\RadcheckController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\DashboardController;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\GuestController;
 
 //Route::get('/', [UserController::class,'index']);
 // Route::get('/', [MikrotikController::class,'system'])->name('root');
 
 // Route::get('/dashboard', [DashboardController::class,'index']);
 
-Route::get('/', [DashboardController::class,'index']);
+// Route::get('/', [DashboardController::class,'index']); <--- hapus
+
 Route::get('/dashboard/export', [DashboardController::class, 'export'])
     ->name('dashboard.export');
 /** API untuk hotspot */
@@ -31,10 +35,12 @@ Route::get('/csrf-token', function () {
 /** End API untuk hotspot */
 
 Route::get('/home', [AdminController::class,'index']);
-Route::get('/login', [UserController::class,'index']);
+// Route::get('/login', [UserController::class,'index']); <--- kita hapus
 Route::get('/user/register',[UserController::class,'registeruser']);
 Route::post('/user/register',[UserController::class,'store']);
-Route::post('/login',[UserController::class,'authenticate']);
+// Route::post('/login',[UserController::class,'authenticate']); <--- kita hapus
+
+
 
 
 Route::prefix('/web')->group(function () {
@@ -51,9 +57,9 @@ Route::prefix('/web')->group(function () {
     Route::get('/countries', [CountryController::class,'show'])->name('country');
 });
 
-Route::middleware('auth')->group(function () {
-    Route::post('/logout',[UserController::class,'actionlogout']);
-});
+// Route::middleware('auth')->group(function () {
+//     Route::post('/logout',[UserController::class,'actionlogout']);
+// }); <--- kita hapus
 
 // Route::middleware('admin')->prefix('/admin')->group(function () {
     
@@ -125,3 +131,58 @@ Route::middleware('auth')->prefix('/mikrotik')->group(function () {
     });
 });
 
+
+/*
+|--------------------------------------------------------------------------
+| PUBLIC ROUTES
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/', function () {
+    return Auth::check()
+        ? redirect('/dashboard')
+        : redirect('/login');
+});
+
+/*
+|--------------------------------------------------------------------------
+| AUTH
+|--------------------------------------------------------------------------
+*/
+
+
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+/*
+|--------------------------------------------------------------------------
+| PROTECTED
+|--------------------------------------------------------------------------
+*/
+
+
+Route::middleware(['auth'])->group(function () {
+
+    Route::get('/dashboard',  [DashboardController::class,'index']);
+
+    // Route::middleware(['admin'])->group(function () {
+    //     Route::resource('/admin/guests', GuestController::class);
+    //     Route::resource('/admin/mikrotik', MikrotikController::class);
+    // });
+
+});
+
+Route::middleware(['auth', 'admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+
+    Route::get('/', function () {
+        return view('admin.dashboard');
+    });
+
+    Route::resource('guests', GuestController::class);
+    Route::resource('mikrotik', MikrotikController::class);
+
+});

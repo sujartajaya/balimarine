@@ -8,6 +8,10 @@ use App\Models\Radacct;
 
 class Guest extends Model
 {
+
+    protected $keyType = 'string';
+    public $incrementing = false;
+
     protected $fillable = [
         'name',
         'email',
@@ -18,6 +22,11 @@ class Guest extends Model
         'os_client',
         'browser_client'
     ];
+
+    public function getRouteKeyName()
+    {
+        return 'id'; // tetap id, tapi sekarang string UUID
+    }
 
     public function radacct() 
     {
