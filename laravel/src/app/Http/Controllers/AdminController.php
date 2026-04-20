@@ -14,10 +14,16 @@ class AdminController extends Controller
     public function index()
     {
 
-        $totalUsers = Guest::count();
-        $activeSessions = Radacct::whereNull('acctstoptime')->count();
+        $totalUsers = Guest::query()->count();
 
-        return view('admin.dashboard',compact('totalUsers','activeSessions'));
+        $activeSessions = Radacct::query()
+            ->whereNull('acctstoptime')
+            ->count();
+
+        return view('admin.dashboard', compact(
+            'totalUsers',
+            'activeSessions'
+        ));
     }
 
     /**

@@ -178,9 +178,7 @@ Route::middleware(['auth', 'admin'])
     ->name('admin.')
     ->group(function () {
 
-    Route::get('/', function () {
-        return view('admin.dashboard');
-    });
+    Route::get('/', [AdminController::class,'index']);
 
     Route::resource('guests', GuestController::class);
     Route::resource('mikrotik', MikrotikController::class);
