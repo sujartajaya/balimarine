@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Guest;
+use App\Models\Radacct;
 
 class AdminController extends Controller
 {
@@ -11,7 +13,11 @@ class AdminController extends Controller
      */
     public function index()
     {
-        return view('admin.dashboard');
+
+        $totalUsers = Guest::count();
+        $activeSessions = Radacct::whereNull('acctstoptime')->count();
+
+        return view('admin.dashboard',compact('totalUsers','activeSessions'));
     }
 
     /**
