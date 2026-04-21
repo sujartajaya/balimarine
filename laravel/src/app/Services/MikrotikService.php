@@ -37,4 +37,34 @@ class MikrotikService
         return true;
     }
 
+    public function getIpBindings()
+    {
+        $query = new Query('/ip/hotspot/ip-binding/print');
+        return $this->client->query($query)->read();
+    }
+
+    public function addMacBinding($mac, $comment = '', $type = 'bypassed')
+    {
+        $query = new Query('/ip/hotspot/ip-binding/add');
+        $query->equal('mac-address', $mac);
+        $query->equal('type', $type); // bypassed / blocked / regular
+        $query->equal('comment', $comment);
+
+        return $this->client->query($query)->read();
+    }
+
+    public function removeMacBinding($id)
+    {
+        $query = new Query('/ip/hotspot/ip-binding/remove');
+        $query->equal('.id', $id);
+
+        return $this->client->query($query)->read();
+    }
+
+    public function getActiveUsers()
+    {
+        $query = new Query('/ip/hotspot/active/print');
+        return $this->client->query($query)->read();
+    }
+
 }

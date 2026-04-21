@@ -5,9 +5,16 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Guest;
 use App\Models\Radacct;
+use App\Services\MikrotikService;
 
 class AdminController extends Controller
 {
+    protected $mikrotik;
+
+    public function __construct(MikrotikService $mikrotik)
+    {
+        $this->mikrotik = $mikrotik;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -72,5 +79,21 @@ class AdminController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function routerDashboard()
+    {
+        $active = $this->mikrotik->getActiveUsers();
+
+        $totalUsers = count($active);
+
+        return view('admin.mikrotik.index', compact('active', 'totalUsers'));
+    }
+    
+    public function disconnect(Request $request)
+    {
+        $this->mikrotik->disconnectUser($request->username);
+
+        return back()->with('success', 'User berhasil di-disconnect');
     }
 }

@@ -16,6 +16,10 @@
         📡 Hotspot router
     </a>
 
+    <a href="/admin/mac-binding" class="block hover:text-cyan-400">
+        🔗 MAC Binding
+    </a>
+
     <a href="#" class="block hover:text-cyan-400">
         📈 Traffic
     </a>

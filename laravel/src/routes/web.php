@@ -17,7 +17,7 @@ use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GuestController;
-
+use App\Http\Controllers\MacBindingController;
 //Route::get('/', [UserController::class,'index']);
 // Route::get('/', [MikrotikController::class,'system'])->name('root');
 
@@ -181,6 +181,11 @@ Route::middleware(['auth', 'admin'])
     Route::get('/', [AdminController::class,'index']);
 
     Route::resource('guests', GuestController::class);
-    Route::resource('mikrotik', MikrotikController::class);
+    Route::get('/mikrotik', [AdminController::class, 'routerDashboard']);
+    Route::post('/mikrotik/disconnect', [AdminController::class, 'disconnect']);
+    //mikrotik
+    Route::get('/mac-binding', [MacBindingController::class, 'index']);
+    Route::post('/mac-binding', [MacBindingController::class, 'store']);
+    Route::delete('/mac-binding', [MacBindingController::class, 'destroy']);
 
 });
