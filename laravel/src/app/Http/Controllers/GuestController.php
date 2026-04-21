@@ -93,6 +93,23 @@ class GuestController extends Controller
         // 🔥 RADCHECK (AUTH)
         // ========================
 
+        //Password
+
+        if ($request->password) {
+             $guest->update([
+                'password' => $request->password,
+            ]);
+            Radcheck::updateOrCreate(
+                [
+                    'username' => $request->username,
+                    'attribute' => 'Cleartext-Password'
+                ],
+                [
+                    'op' => ':=',
+                    'value' => $request->password
+                ]
+            );
+        }
         // Expired
         if ($request->expired) {
             Radcheck::updateOrCreate(
