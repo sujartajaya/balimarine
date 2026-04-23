@@ -13,41 +13,6 @@ r = redis.Redis(
     decode_responses=True
 )
 
-# @app.websocket("/ws/traffic")
-# async def websocket_traffic(websocket: WebSocket):
-#     await websocket.accept()
-#     print("WS CONNECTED")
-
-#     try:
-#         while True:
-#             data = r.get("mikrotik:traffic")
-
-#             if not data:
-#                 response = {"download": 0, "upload": 0}
-#                 await websocket.send_text(json.dumps(response))
-#                 await asyncio.sleep(2)
-#                 continue
-
-#             try:
-#                 parsed = json.loads(data)
-#             except:
-#                 parsed = {}
-
-#             iface = next(iter(parsed.values()), {})
-
-#             response = {
-#                 "download": int(iface.get("rx", 0)),
-#                 "upload": int(iface.get("tx", 0)),
-#             }
-
-#             print("SEND:", response)
-
-#             await websocket.send_text(json.dumps(response))
-#             await asyncio.sleep(2)
-
-#     except WebSocketDisconnect:
-#         print("Client disconnected")
-
 @app.websocket("/ws/traffic")
 async def websocket_traffic(websocket: WebSocket):
     await websocket.accept()
@@ -88,8 +53,12 @@ async def websocket_traffic(websocket: WebSocket):
     except WebSocketDisconnect:
         print("Client disconnected")
 
+
 @app.get("/interfaces")
 def get_interfaces():
-    conn = get_connection()
-    interfaces = conn("/interface/print")
-    return [i["name"] for i in interfaces]
+    data = r.get("mikrotik:interfaces")
+
+    if not data:
+        return []
+
+    return json.loads(data)

@@ -21,3 +21,8 @@ def get_connection():
                     port=int(os.getenv("MIKROTIK_PORT", 8728)),
                 )
     return _connection
+
+def reset_connection():
+    global _connection
+    with _lock:
+        _connection = None

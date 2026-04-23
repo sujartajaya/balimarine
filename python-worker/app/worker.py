@@ -1,61 +1,8 @@
-# import time
-# import json
-# import redis
-# import os
-# from mikrotik import get_connection
-
-# print("🔥 WORKER STARTED", flush=True)
-
-# r = redis.Redis(
-#     host=os.getenv("REDIS_HOST", "redis"),
-#     port=int(os.getenv("REDIS_PORT", 6379)),
-#     decode_responses=True
-# )
-
-# def run():
-#     print("CONNECTING MIKROTIK...", flush=True)
-#     conn = get_connection()
-#     print("CONNECTED!", flush=True)
-
-#     while True:
-#         try:
-#             print("FETCH TRAFFIC...", flush=True)
-
-#             monitor = conn(
-#                 "/interface/monitor-traffic",
-#                 interface="ether1",
-#                 once=True
-#             )
-
-#             data = list(monitor)[0]
-
-#             print("RAW:", data, flush=True)
-
-#             result = {
-#                 "ether1": {
-#                     "rx": int(data.get("rx-bits-per-second", 0)),
-#                     "tx": int(data.get("tx-bits-per-second", 0))
-#                 }
-#             }
-
-#             print("SAVE:", result, flush=True)
-
-#             r.set("mikrotik:traffic", json.dumps(result))
-
-#             time.sleep(2)
-
-#         except Exception as e:
-#             print("ERROR:", e, flush=True)
-#             time.sleep(5)
-
-# if __name__ == "__main__":
-#     run()
-
 import time
 import json
 import redis
 import os
-from mikrotik import get_connection
+from mikrotik import get_connection, reset_connection
 
 print("🔥 WORKER STARTED", flush=True)
 
@@ -67,14 +14,17 @@ r = redis.Redis(
 
 def run():
     print("CONNECTING MIKROTIK...", flush=True)
-    conn = get_connection()
-    print("CONNECTED!", flush=True)
+    conn = None
 
     while True:
         try:
+            if conn is None:
+                print("RECONNECTING...", flush=True)
+                conn = get_connection()
+                print("CONNECTED!", flush=True)
+
             print("FETCH ALL INTERFACES...", flush=True)
 
-            # 🔥 ambil semua interface
             interfaces = list(conn("/interface/print"))
 
             result = {}
@@ -101,13 +51,23 @@ def run():
 
             print("SAVE:", result, flush=True)
 
-            # 🔥 simpan semua interface
             r.set("mikrotik:traffic", json.dumps(result))
+
+            # Mendapatkan nama interface
+            interface_list = [iface.get("name") for iface in interfaces]
+            r.set("mikrotik:interfaces", json.dumps(interface_list))
 
             time.sleep(2)
 
         except Exception as e:
             print("ERROR LOOP:", e, flush=True)
+
+            # 🔥 RESET GLOBAL CONNECTION (WAJIB)
+            reset_connection()
+
+            # 🔥 RESET LOCAL CONNECTION
+            conn = None
+
             time.sleep(5)
 
 if __name__ == "__main__":
