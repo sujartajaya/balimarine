@@ -33,7 +33,7 @@ class LogController extends Controller
     public function export(Request $request)
     {
         return Excel::download(
-            new UsersExport($request->start_date, $request->end_date),
+            new UsersExport($request->search,$request->start_date, $request->end_date),
             'logs.xlsx'
         );
     }

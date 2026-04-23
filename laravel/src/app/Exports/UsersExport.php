@@ -22,36 +22,45 @@ class UsersExport implements FromCollection, WithHeadings
 
     public function collection()
     {
-        $query = Radacct::with('guest')
-            ->whereNull('acctstoptime');
+        $query = Radacct::with('guest');
 
-        // 🔍 filter search ikut export
+        // 🔍 FILTER SEARCH
         if ($this->search) {
             $search = $this->search;
 
             $query->where(function ($q) use ($search) {
                 $q->where('username', 'like', "%$search%")
-                  ->orWhere('callingstationid', 'like', "%$search%")
-                  ->orWhereHas('guest', function ($q2) use ($search) {
-                      $q2->where('email', 'like', "%$search%");
-                  });
+                ->orWhere('callingstationid', 'like', "%$search%")
+                ->orWhereHas('guest', function ($q2) use ($search) {
+                    $q2->where('email', 'like', "%$search%");
+                });
             });
         }
 
-        return $query->get()->map(function ($row) {
-            return [
-                'Username' => $row->username,
-                'Email' => $row->guest->email ?? '-',
-                'OS' => $row->guest->os_client ?? '-',
-                'Browser' => $row->guest->browser_client ?? '-',
-                'IP' => $row->framedipaddress,
-                'MAC' => $row->callingstationid,
-                'Start Time' => $row->acctstarttime,
-                'Traffic (MB)' => number_format(
-                    ($row->acctinputoctets + $row->acctoutputoctets)/1024/1024, 2
-                ),
-            ];
-        });
+        // 🔥 FILTER TANGGAL (INI YANG PENTING)
+        if ($this->start && $this->end) {
+            $query->whereBetween('acctstarttime', [
+                $this->start . ' 00:00:00',
+                $this->end . ' 23:59:59'
+            ]);
+        }
+
+        return $query->orderByDesc('acctstarttime')
+            ->get()
+            ->map(function ($row) {
+                return [
+                    'Username' => $row->username,
+                    'Email' => $row->guest->email ?? '-',
+                    'OS' => $row->guest->os_client ?? '-',
+                    'Browser' => $row->guest->browser_client ?? '-',
+                    'IP' => $row->framedipaddress,
+                    'MAC' => $row->callingstationid,
+                    'Start Time' => $row->acctstarttime,
+                    'Traffic (MB)' => number_format(
+                        ($row->acctinputoctets + $row->acctoutputoctets)/1024/1024, 2
+                    ),
+                ];
+            });
     }
 
     public function headings(): array
