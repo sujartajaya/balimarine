@@ -24,7 +24,7 @@
         📈 Traffic
     </a>
 
-    <a href="#" class="block hover:text-cyan-400">
+    <a href="{{ route('admin.logs') }}" class="block hover:text-cyan-400">
         📜 Logs
     </a>
 

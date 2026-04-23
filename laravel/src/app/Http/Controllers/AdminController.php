@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Guest;
 use App\Models\Radacct;
 use App\Services\MikrotikService;
+use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
@@ -18,18 +19,26 @@ class AdminController extends Controller
     /**
      * Display a listing of the resource.
      */
+
     public function index()
     {
+        $totalUsers = Guest::count();
 
-        $totalUsers = Guest::query()->count();
+        $activeSessions = Radacct::whereNull('acctstoptime')->count();
 
-        $activeSessions = Radacct::query()
-            ->whereNull('acctstoptime')
-            ->count();
+        // 🔥 TOP 5 USER TRAFFIC
+        $topUsers = Radacct::select(
+                'username',
+                DB::raw('(acctinputoctets + acctoutputoctets) as total')
+            )
+            ->orderByDesc('total')
+            ->limit(5)
+            ->get();
 
         return view('admin.dashboard', compact(
             'totalUsers',
-            'activeSessions'
+            'activeSessions',
+            'topUsers'
         ));
     }
 

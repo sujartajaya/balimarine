@@ -50,7 +50,8 @@ def run():
                     print(f"ERROR IFACE {name}: {e}", flush=True)
 
             print("SAVE:", result, flush=True)
-
+            
+            # Mendapatkan traffic
             r.set("mikrotik:traffic", json.dumps(result))
 
             # Mendapatkan nama interface

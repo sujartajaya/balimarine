@@ -192,4 +192,6 @@ Route::middleware(['auth', 'admin'])
         return view('admin.mikrotik.traffic.index');
     })->name('traffic');
 
+    Route::get('/logs', [App\Http\Controllers\Admin\LogController::class, 'index'])->name('logs');
+    Route::get('/logs/export', [App\Http\Controllers\Admin\LogController::class, 'export'])->name('logs.export');
 });

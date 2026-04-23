@@ -10,10 +10,14 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 class UsersExport implements FromCollection, WithHeadings
 {
     protected $search;
+    protected $start;
+    protected $end;
 
-    public function __construct($search = null)
+    public function __construct($search = null, $start = null, $end = null)
     {
         $this->search = $search;
+        $this->start = $start;
+        $this->end = $end;
     }
 
     public function collection()

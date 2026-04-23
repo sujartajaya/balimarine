@@ -54,7 +54,7 @@ async def websocket_traffic(websocket: WebSocket):
         print("Client disconnected")
 
 
-@app.get("/interfaces")
+@app.get("/api/interfaces")
 def get_interfaces():
     data = r.get("mikrotik:interfaces")
 

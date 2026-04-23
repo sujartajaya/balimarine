@@ -74,7 +74,7 @@ function connectWS() {
 
 // 🔥 LOAD INTERFACE DARI API
 function loadInterfaces() {
-    fetch("/interfaces")
+    fetch("/api/interfaces")
         .then(res => res.json())
         .then(data => {
             const select = document.getElementById("interfaceSelect");
