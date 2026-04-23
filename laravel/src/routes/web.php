@@ -187,5 +187,9 @@ Route::middleware(['auth', 'admin'])
     Route::get('/mac-binding', [MacBindingController::class, 'index']);
     Route::post('/mac-binding', [MacBindingController::class, 'store']);
     Route::delete('/mac-binding', [MacBindingController::class, 'destroy']);
+    /** traffic */
+    Route::get('/traffic', function () {
+        return view('admin.mikrotik.traffic.index');
+    })->name('traffic');
 
 });

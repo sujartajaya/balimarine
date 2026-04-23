@@ -93,6 +93,43 @@ services:
     networks:
       - localnet
 
+  redis:
+      image: redis:alpine
+      container_name: my-redis-container-01
+      restart: unless-stopped
+      networks:
+        - localnet  
+
+  python-api:
+    build:
+      context: ./python-worker
+    container_name: my-python-api-01
+    command: uvicorn app.main:app --host 0.0.0.0 --port 9000
+    ports:
+      - 9000:9000
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    volumes:
+      - ./python-worker/app:/app/app
+    networks:
+      - localnet
+
+  python-worker:
+    build:
+      context: ./python-worker
+    container_name: my-python-worker-01
+    command: python app/worker.py
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    volumes:
+      - ./python-worker/app:/app/app
+    networks:
+      - localnet
+
 networks:
   localnet:
     driver: bridge

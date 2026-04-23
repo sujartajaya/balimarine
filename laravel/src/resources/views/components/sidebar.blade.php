@@ -20,7 +20,7 @@
         🔗 MAC Binding
     </a>
 
-    <a href="#" class="block hover:text-cyan-400">
+    <a href="{{ route('admin.traffic') }}" class="block hover:text-cyan-400">
         📈 Traffic
     </a>
 

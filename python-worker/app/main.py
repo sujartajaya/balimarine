@@ -1,0 +1,95 @@
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+import redis
+import json
+import os
+import asyncio
+from app.mikrotik import get_connection
+
+app = FastAPI()
+
+r = redis.Redis(
+    host=os.getenv("REDIS_HOST", "redis"),
+    port=int(os.getenv("REDIS_PORT", 6379)),
+    decode_responses=True
+)
+
+# @app.websocket("/ws/traffic")
+# async def websocket_traffic(websocket: WebSocket):
+#     await websocket.accept()
+#     print("WS CONNECTED")
+
+#     try:
+#         while True:
+#             data = r.get("mikrotik:traffic")
+
+#             if not data:
+#                 response = {"download": 0, "upload": 0}
+#                 await websocket.send_text(json.dumps(response))
+#                 await asyncio.sleep(2)
+#                 continue
+
+#             try:
+#                 parsed = json.loads(data)
+#             except:
+#                 parsed = {}
+
+#             iface = next(iter(parsed.values()), {})
+
+#             response = {
+#                 "download": int(iface.get("rx", 0)),
+#                 "upload": int(iface.get("tx", 0)),
+#             }
+
+#             print("SEND:", response)
+
+#             await websocket.send_text(json.dumps(response))
+#             await asyncio.sleep(2)
+
+#     except WebSocketDisconnect:
+#         print("Client disconnected")
+
+@app.websocket("/ws/traffic")
+async def websocket_traffic(websocket: WebSocket):
+    await websocket.accept()
+    print("WS CONNECTED")
+
+    selected_interface = "ether1"  # default
+
+    try:
+        while True:
+            # 🔥 TERIMA DARI CLIENT (non-blocking)
+            try:
+                msg = await asyncio.wait_for(websocket.receive_text(), timeout=0.1)
+                selected_interface = msg
+                print("SELECTED:", selected_interface)
+            except asyncio.TimeoutError:
+                pass
+
+            data = r.get("mikrotik:traffic")
+
+            if not data:
+                response = {"download": 0, "upload": 0}
+            else:
+                try:
+                    parsed = json.loads(data)
+                except:
+                    parsed = {}
+
+                iface = parsed.get(selected_interface, {})
+
+                response = {
+                    "download": int(iface.get("rx", 0)),
+                    "upload": int(iface.get("tx", 0)),
+                }
+
+            await websocket.send_text(json.dumps(response))
+            await asyncio.sleep(2)
+
+    except WebSocketDisconnect:
+        print("Client disconnected")
+
+@app.get("/interfaces")
+def get_interfaces():
+    conn = get_connection()
+    interfaces = conn("/interface/print")
+    return [i["name"] for i in interfaces]

@@ -1,0 +1,119 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Realtime Traffic</title>
+        <style>
+            body {
+                font-family: Arial;
+                text-align: center;
+                padding: 20px;
+            }
+            .card {
+                border: 1px solid #ccc;
+                padding: 20px;
+                border-radius: 10px;
+                display: inline-block;
+                min-width: 200px;
+            }
+            .value {
+                font-size: 24px;
+                font-weight: bold;
+            }
+        </style>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </head>
+    <body>
+        <h2>Realtime Traffic</h2>
+        <div class="card">
+            <p>Download</p>
+            <div id="download" class="value">0</div>
+        </div>
+
+        <div class="card">
+            <p>Upload</p>
+            <div id="upload" class="value">0</div>
+        </div>
+        <canvas id="trafficChart"></canvas>
+        <script>
+            const ctx = document
+                .getElementById("trafficChart")
+                .getContext("2d");
+
+            const chart = new Chart(ctx, {
+                type: "line",
+                tension: 0.4,
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: "Download",
+                            data: [],
+                            borderColor: "#3b82f6",
+                            backgroundColor: "rgba(59,130,246,0.2)",
+                            fill: true,
+                            tension: 0.4,
+                        },
+                        {
+                            label: "Upload",
+                            data: [],
+                            borderColor: "#ef4444",
+                            backgroundColor: "rgba(239,68,68,0.2)",
+                            fill: true,
+                            tension: 0.4,
+                        },
+                    ],
+                },
+                options: {
+                    animation: false,
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: (value) =>
+                                    (value / 1_000_000).toFixed(1) + " Mbps",
+                            },
+                        },
+                    },
+                },
+            });
+
+            const ws = new WebSocket(`ws://${location.host}/ws/traffic`);
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+
+                // update angka
+                document.getElementById("download").innerText =
+                    formatMbps(data.download) + " Mbps";
+                document.getElementById("upload").innerText =
+                    formatMbps(data.upload) + " Mbps";
+
+                // update chart
+                const time = new Date().toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                });
+
+                chart.data.labels.push(time);
+                chart.data.datasets[0].data.push(data.download);
+                chart.data.datasets[1].data.push(data.upload);
+
+                // batasi 30 data terakhir
+                const MAX_POINTS = 30;
+
+                if (chart.data.labels.length > MAX_POINTS) {
+                    chart.data.labels.shift();
+                    chart.data.datasets.forEach((ds) => ds.data.shift());
+                }
+
+                chart.update();
+            };
+
+            function formatMbps(value) {
+                return (value / 1_000_000).toFixed(2);
+            }
+        </script>
+    </body>
+</html>

@@ -1,0 +1,5 @@
+fastapi
+uvicorn[standard]
+librouteros
+redis
+python-dotenv
