@@ -27,7 +27,7 @@ class LogController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return view('admin.logs.index', compact('logs', 'start', 'end'));
+        return view('admin.reports.index', compact('logs', 'start', 'end'));
     }
 
     public function export(Request $request)
