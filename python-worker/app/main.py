@@ -62,3 +62,14 @@ def get_interfaces():
         return []
 
     return json.loads(data)
+
+
+@app.get("/api/mikrotik/health")
+def mikrotik_health():
+    data = r.get("mikrotik:health")
+
+    if not data:
+        return {"error": "No data from worker"}
+
+    return json.loads(data)
+

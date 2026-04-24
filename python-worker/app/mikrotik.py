@@ -26,3 +26,27 @@ def reset_connection():
     global _connection
     with _lock:
         _connection = None
+
+
+# def get_system_resource():
+#     api = get_connection()
+#     return list(api.path("/system/resource"))[0]
+
+
+# def get_identity():
+#     api = get_connection()
+#     return list(api.path("/system/identity"))[0]
+
+
+# def get_active_users():
+#     api = get_connection()
+#     return len(list(api.path("/ip/hotspot/active")))
+
+# def get_system_health():
+#     api = get_connection()
+#     data = list(api.path("/system/health"))
+
+#     if len(data) > 0:
+#         return data[0]
+
+#     return {}
