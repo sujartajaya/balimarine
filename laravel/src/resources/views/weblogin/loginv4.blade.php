@@ -66,7 +66,7 @@
         </button>
 
         <div class="mt-4">
-            <p id="errorInfo" class="font-bold text-yellow-300 text-xs"></p>
+            <p id="errorInfo" class="font-bold text-yellow-300 text-xs">{{ $data['error'] }}</p>
         </div>
     </div>
 
