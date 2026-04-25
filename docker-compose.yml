@@ -130,6 +130,21 @@ services:
     networks:
       - localnet
 
+  email-validator:
+    build:
+      context: ./python-email-validator
+    container_name: email-validator
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./python-email-validator/data:/data
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    networks:
+      - localnet
+
 networks:
   localnet:
     driver: bridge
