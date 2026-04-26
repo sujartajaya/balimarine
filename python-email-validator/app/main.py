@@ -41,7 +41,7 @@ def validate(req: EmailRequest):
             "mac": mac,
             "blocked": True,
             "retry_after": ttl,
-            "message": "Terlalu banyak percobaan. Coba lagi nanti."
+            "message": "Too many attempts."
         }
 
     # 🔍 jalankan validator
@@ -67,7 +67,7 @@ def validate(req: EmailRequest):
                 "email": email,
                 "mac": mac,
                 "blocked": True,
-                "message": "Terlalu banyak percobaan. Diblokir 5 menit."
+                "message": "Too many attempts. You are blocked for 5 minutes."
             }
 
         return {

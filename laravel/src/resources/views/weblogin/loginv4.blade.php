@@ -131,7 +131,7 @@
                 }
 
                 if (result.retry_after) {
-                    errmsg += `<br>Coba lagi dalam ${result.retry_after} detik`;
+                    errmsg += `<br>Please try again in ${result.retry_after} seconds`;
                 }
 
                 errorInfo.innerHTML = errmsg;
