@@ -38,28 +38,26 @@
                 <tr>
                     <th class="p-2">Username</th>
                     <th>Email</th>
-                    <th>IP</th>
                     <th>MAC</th>
-                    <th>Start</th>
+                    <th>OS</th>
+                    <th>Browser</th>
                     <th>Traffic (MB)</th>
                 </tr>
             </thead>
+
             <tbody>
-                @foreach($logs as $log)
-                <tr class="border-b hover:bg-gray-100">
-                    <td class="p-2">{{ $log->username }}</td>
-                    <td>{{ $log->guest->email ?? '-' }}</td>
-                    <td>{{ $log->framedipaddress }}</td>
-                    <td>{{ $log->callingstationid }}</td>
-                    <td>{{ $log->acctstarttime }}</td>
-                    <td>
-                        {{ number_format(
-                            ($log->acctinputoctets + $log->acctoutputoctets)/1024/1024, 
-                            2
-                        ) }}
-                    </td>
-                </tr>
-                @endforeach
+            @foreach($logs as $log)
+            <tr class="border-b hover:bg-gray-100">
+                <td class="p-2">{{ $log->username }}</td>
+                <td>{{ $log->email }}</td>
+                <td>{{ $log->mac_add }}</td>
+                <td>{{ $log->os_client }}</td>
+                <td>{{ $log->browser_client }}</td>
+                <td>
+                    {{ number_format($log->total_bytes / 1024 / 1024, 2) }}
+                </td>
+            </tr>
+            @endforeach
             </tbody>
         </table>
 

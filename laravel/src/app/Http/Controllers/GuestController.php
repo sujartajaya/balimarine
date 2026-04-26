@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Guest;
 use App\Models\Radreply;
 use App\Models\Radcheck;
+use Carbon\Carbon;
 
 
 use Illuminate\Http\Request;
@@ -62,9 +63,13 @@ class GuestController extends Controller
      */
     public function edit(Guest $guest)
     {
-         $expire_date = Radcheck::where('username', $guest->username)
+         $expiration = Radcheck::where('username', $guest->username)
         ->where('attribute', 'Expiration')
-        ->first();
+        ->value('value'); // ✅ ini penting
+
+        $expire_date = $expiration
+        ? \Carbon\Carbon::createFromFormat('d M Y', trim($expiration))->format('Y-m-d')
+        : null;
 
         $limit_rate = Radreply::where('username', $guest->username)
         ->where('attribute', 'Mikrotik-Rate-Limit')
@@ -112,6 +117,9 @@ class GuestController extends Controller
         }
         // Expired
         if ($request->expired) {
+
+            $formattedDate = Carbon::parse($request->expired)->format('d M Y');
+
             Radcheck::updateOrCreate(
                 [
                     'username' => $guest->username,
@@ -119,7 +127,7 @@ class GuestController extends Controller
                 ],
                 [
                     'op' => ':=',
-                    'value' => $request->expired
+                    'value' => $formattedDate
                 ]
             );
         }

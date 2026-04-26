@@ -78,7 +78,7 @@
                         <label class="text-sm text-gray-300">Expiration</label>
                         <input type="date"
                                name="expired"
-                               value="{{ optional($expire_date)->value }}"
+                               value="{{ $expire_date }}"
                                class="w-full mt-1 p-2 rounded-lg text-black">
                     </div>
 
