@@ -42,7 +42,11 @@
 
 <body class="p-4">
 
-<div class="max-w-sm w-full bg-red-600/80 p-8 rounded-3xl text-center text-blue-600 shadow-2xl backdrop-blur-md">
+<div class="rounded-xl mt-6 w-full px-6 py-3 
+       bg-white/70 backdrop-blur-sm 
+       text-gray-900 
+       border border-white/30
+       focus:ring-2 focus:ring-teal-300 outline-none">
     
     <!-- ✅ SELALU tampilkan ini -->
     <p class="text-sm px-2" id="welcomeinfo">
@@ -100,7 +104,10 @@
         try {
             const response = await fetch(post_url, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    
+                },
                 body: JSON.stringify({
                     name: email.value,
                     email: email.value,
@@ -112,25 +119,29 @@
             const result = await response.json();
 
             if (result.error === true) {
+
                 let errmsg = "";
 
-                if (typeof result.msg.name !== "undefined") {
-                    errmsg = `<b>${result.msg.name[0]}</b><br>`;
+                if (typeof result.msg === "string") {
+                    errmsg = result.msg;
+                } else if (typeof result.msg === "object") {
+                    for (const key in result.msg) {
+                        errmsg += `<b>${result.msg[key][0]}</b><br>`;
+                    }
                 }
 
-                if (typeof result.msg.email !== "undefined") {
-                    errmsg += `<b>${result.msg.email[0]}</b>`;
+                if (result.retry_after) {
+                    errmsg += `<br>Coba lagi dalam ${result.retry_after} detik`;
                 }
 
                 errorInfo.innerHTML = errmsg;
                 return;
             }
 
-            // set credential ke form mikrotik
+            // SUCCESS LOGIN
             document.loginweb.username.value = result.msg.username;
             document.loginweb.password.value = result.msg.password;
 
-            // langsung submit (tidak perlu tombol kedua lagi)
             loginMikrotik();
 
         } catch (error) {

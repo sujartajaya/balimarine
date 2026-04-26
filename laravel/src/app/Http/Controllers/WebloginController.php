@@ -10,6 +10,7 @@ use DateTime;
 use App\Models\Guest;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Http;
 
 class WebloginController extends Controller
 {
@@ -95,74 +96,148 @@ class WebloginController extends Controller
     public function storev4(Request $request)
     {
         $datareq = $request->all();
-        $data = [];
-        $datareq['os_client'] = $this->getOS();
-        $datareq['browser_client'] = $this->getBrowser();
-	$name = explode("@",$datareq['name']);
-	$datanm = explode(".",$name[0]);
-	$nama = "";
-	for ($i=0;$i < count($datanm);$i++) {
-		if ($i==0) { $nama = $datanm[$i]; } else $nama = $nama." ".$datanm[$i];
-	}
-	$datareq['name'] = ucwords($nama);
 
-        $guest = Guest::where('email',$datareq['email'])->first();
-        if ($guest) {
-            $data['error'] = false;
-            $data['exist'] = true;
-            $data['msg'] = $guest;
-            $guest->mac_add = $datareq['mac_add'];
-            $guest->os_client = $this->getOS();
-            $guest->browser_client = $this->getBrowser();
-            $guest->update();
-            $userlogin = Radcheck::where('username',$guest->username)->first();
-	    if (!$userlogin) {
-		$usrlogin['username'] = $guest->username;
-                $usrlogin['op'] = ":=";
-                $usrlogin['attribute'] = "Cleartext-Password";
-                $usrlogin['value'] = $guest->password;
-                $radcheck = Radcheck::create($usrlogin);
-	    }
-            return response()->json($data,200);
+        // ========================
+        // 🔥 BASIC VALIDATION (tanpa DNS)
+        // ========================
+        $basicValidator = Validator::make($datareq, [
+            'email' => ['required'],
+            'mac_add' => ['required'],
+            'country_id' => ['required']
+        ]);
+
+        if ($basicValidator->fails()) {
+            return response()->json([
+                'error' => true,
+                'exist' => false,
+                'msg'   => $basicValidator->messages()
+            ], 200);
         }
 
+        // ========================
+        // 🔥 VALIDASI EMAIL VIA PYTHON API
+        // ========================
+        $validatorApi = Http::timeout(5)
+            ->retry(2, 100)
+            ->post('http://email-validator:9090/validate', [
+                'email' => $datareq['email'],
+                'mac'   => $datareq['mac_add']
+            ]);
+
+        if (!$validatorApi->ok()) {
+            return response()->json([
+                'error' => true,
+                'exist' => false,
+                'msg'   => 'Validator service error'
+            ], 500);
+        }
+
+        $validation = $validatorApi->json();
+
+        // 🚫 BLOCKED (rate limit dari Redis Python)
+        if (!empty($validation['blocked']) && $validation['blocked'] === true) {
+            return response()->json([
+                'error' => true,
+                'exist' => false,
+                'msg'   => $validation['message'] ?? 'Too many attempts',
+                'retry_after' => $validation['retry_after'] ?? null
+            ], 200);
+        }
+
+        // ❌ INVALID EMAIL
+        if (empty($validation['is_valid']) || $validation['is_valid'] !== true) {
+            return response()->json([
+                'error' => true,
+                'exist' => false,
+                'msg'   => 'Email tidak valid',
+                'detail'=> $validation
+            ], 200);
+        }
+
+        // ========================
+        // 🔥 PREPARE DATA
+        // ========================
+        $datareq['os_client'] = $this->getOS();
+        $datareq['browser_client'] = $this->getBrowser();
+
+        // generate name dari email (user@domain → "User")
+        $name = explode("@", $datareq['email']);
+        $datanm = explode(".", $name[0]);
+        $nama = "";
+        foreach ($datanm as $i => $val) {
+            $nama .= $i === 0 ? $val : " ".$val;
+        }
+        $datareq['name'] = ucwords($nama);
+
+        // ========================
+        // 🔥 CEK USER EXIST
+        // ========================
+        $guest = Guest::where('email', $datareq['email'])->first();
+
+        if ($guest) {
+            $guest->update([
+                'mac_add'        => $datareq['mac_add'],
+                'os_client'      => $datareq['os_client'],
+                'browser_client' => $datareq['browser_client'],
+            ]);
+
+            // pastikan ada di radcheck
+            $userlogin = Radcheck::where('username', $guest->username)->first();
+
+            if (!$userlogin) {
+                Radcheck::create([
+                    'username'  => $guest->username,
+                    'attribute' => 'Cleartext-Password',
+                    'op'        => ':=',
+                    'value'     => $guest->password
+                ]);
+            }
+
+            return response()->json([
+                'error' => false,
+                'exist' => true,
+                'msg'   => $guest
+            ], 200);
+        }
+
+        // ========================
+        // 🔥 CREATE USER BARU
+        // ========================
         $datareq['username'] = Str::random(10);
         $datareq['password'] = Str::password(8);
 
-
+        // VALIDASI DB (tanpa email:rfc,dns)
         $validator = Validator::make($datareq, [
-                'name' => ['required'],
-                'email' => ['required','email:rfc,dns','unique:guests'],
-                'username' => ['required','unique:guests'],
-                'password' => ['required'],
-                'mac_add' => ['required'],
-                'country_id' => ['required']
+            'name'     => ['required'],
+            'email'    => ['required', 'unique:guests,email'],
+            'username' => ['required', 'unique:guests,username'],
+            'password' => ['required'],
+            'mac_add'  => ['required'],
+            'country_id' => ['required']
         ]);
 
-        if ($validator)
-        {
-            if ($validator->fails())
-            {
-                $data['error'] = true;
-                $data['exist'] = false;
-                $data['msg'] = $validator->messages();
-                return response()->json($data,200);
-            } else {
-                $data['error'] = false;
-                $data['exist'] = false;
-                $guest = Guest::create($datareq);
-                $data['msg'] = $guest;
-
-                $userlogin['username'] = $datareq['username'];
-                $userlogin['op'] = ":=";
-                $userlogin['attribute'] = "Cleartext-Password";
-                $userlogin['value'] = $datareq['password'];
-
-                $radcheck = Radcheck::create($userlogin);
-
-                return response()->json($data,201);
-            }
+        if ($validator->fails()) {
+            return response()->json([
+                'error' => true,
+                'exist' => false,
+                'msg'   => $validator->messages()
+            ], 200);
         }
+
+        $guest = Guest::create($datareq);
+
+        Radcheck::create([
+            'username'  => $datareq['username'],
+            'attribute' => 'Cleartext-Password',
+            'op'        => ':=',
+            'value'     => $datareq['password']
+        ]);
+
+        return response()->json([
+            'error' => false,
+            'exist' => false,
+            'msg'   => $guest
+        ], 201);
     }
 
 
