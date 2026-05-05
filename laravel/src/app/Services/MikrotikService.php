@@ -40,7 +40,17 @@ class MikrotikService
     public function getIpBindings()
     {
         $query = new Query('/ip/hotspot/ip-binding/print');
-        return $this->client->query($query)->read();
+        $data = $this->client->query($query)->read();
+
+        return array_map(function ($b) {
+            return [
+                '.id'         => $b['.id'] ?? null,
+                'mac-address' => $b['mac-address'] ?? '-',
+                'type'        => $b['type'] ?? 'regular', // 🔥 FIX DISINI
+                'comment'     => $b['comment'] ?? '-',
+                'disabled'    => $b['disabled'] ?? 'false',
+            ];
+        }, $data);
     }
 
     public function addMacBinding($mac, $comment = '', $type = 'bypassed')

@@ -19,7 +19,7 @@ class MacBindingController extends Controller
     {
         $bindings = $this->mikrotik->getIpBindings();
         $guests = Guest::latest()->get();
-
+        // dd($bindings);
         return view('admin.mikrotik.mac-binding.index', compact('bindings', 'guests'));
     }
 
